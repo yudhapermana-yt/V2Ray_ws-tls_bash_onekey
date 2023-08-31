@@ -141,7 +141,7 @@ chrony_install() {
 
     judge "chronyd 启动 "
 
-    timedatectl set-timezone Asia/Shanghai
+    timedatectl set-timezone Asia/Jakarta
 
     echo -e "${OK} ${GreenBG} 等待时间同步 ${Font}"
     sleep 10
@@ -149,7 +149,7 @@ chrony_install() {
     chronyc sourcestats -v
     chronyc tracking -v
     date
-    read -rp "请确认时间是否准确,误差范围±3分钟(Y/N): " chrony_install
+    read -rp "Harap pastikan waktunya akurat, kisaran kesalahan ± 3 menit(Y/N): " chrony_install
     [[ -z ${chrony_install} ]] && chrony_install="Y"
     case $chrony_install in
     [yY][eE][sS] | [yY])
@@ -438,7 +438,7 @@ ssl_install() {
 }
 
 domain_check() {
-    read -rp "请输入你的域名信息(eg:www.wulabing.com):" domain
+    read -rp "Silakan masukkan informasi domain Anda(eg:www.wulabing.com):" domain
     domain_ip=$(curl -sm8 https://ipget.net/?ip="${domain}")
     echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
     wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
@@ -454,26 +454,26 @@ domain_check() {
         echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
         echo -e "${OK} ${GreenBG} 识别为 IPv6 Only 的 VPS，自动添加 DNS64 服务器 ${Font}"
     fi
-    echo -e "域名 DNS 解析到的的 IP：${domain_ip}"
-    echo -e "本机IPv4: ${local_ipv4}"
-    echo -e "本机IPv6: ${local_ipv6}"
+    echo -e "IP：${domain_ip}"
+    echo -e "IPv4: ${local_ipv4}"
+    echo -e "IPv6: ${local_ipv6}"
     sleep 2
     if [[ ${domain_ip} == ${local_ipv4} ]]; then
-        echo -e "${OK} ${GreenBG} 域名 DNS 解析 IP 与 本机 IPv4 匹配 ${Font}"
+        echo -e "${OK} ${GreenBG} IP cocok dengan IPv4 ${Font}"
         sleep 2
     elif [[ ${domain_ip} == ${local_ipv6} ]]; then
-        echo -e "${OK} ${GreenBG} 域名 DNS 解析 IP 与 本机 IPv6 匹配 ${Font}"
+        echo -e "${OK} ${GreenBG} IP cocok dengan IPv6 ${Font}"
         sleep 2
     else
-        echo -e "${Error} ${RedBG} 请确保域名添加了正确的 A / AAAA 记录，否则将无法正常使用 V2ray ${Font}"
-        echo -e "${Error} ${RedBG} 域名 DNS 解析 IP 与 本机 IPv4 / IPv6 不匹配 是否继续安装？（y/n）${Font}" && read -r install
+        echo -e "${Error} ${RedBG} Pastikan catatan A / AAAA yang benar telah ditambahkan ke domain, jika tidak, V2ray tidak akan berfungsi dengan baik! ${Font}"
+        echo -e "${Error} ${RedBG} Nama domain Resolusi DNS IP tidak cocok dengan IPv4/IPv6 lokal Lanjutkan instalasi atau tidak？（y/n）${Font}" && read -r install
         case $install in
         [yY][eE][sS] | [yY])
-            echo -e "${GreenBG} 继续安装 ${Font}"
+            echo -e "${GreenBG} Lanjutkan instalasi ${Font}"
             sleep 2
             ;;
         *)
-            echo -e "${RedBG} 安装终止 ${Font}"
+            echo -e "${RedBG} Hentian instalasi ${Font}"
             exit 2
             ;;
         esac
@@ -722,10 +722,10 @@ vmess_quan_link_image() {
 }
 
 vmess_link_image_choice() {
-        echo "请选择生成的链接种类"
+        echo "Pilih jenis link yang akan dibuat"
         echo "1: V2RayNG/V2RayN"
         echo "2: quantumult"
-        read -rp "请输入：" link_version
+        read -rp "Silakan masukkan：" link_version
         [[ -z ${link_version} ]] && link_version=1
         if [[ $link_version == 1 ]]; then
             vmess_qr_link_image
@@ -742,7 +742,7 @@ info_extraction() {
 
 basic_information() {
     {
-        echo -e "${OK} ${GreenBG} V2ray+ws+tls 安装成功"
+        echo -e "${OK} ${GreenBG} V2ray+ws+tls Instalasi berhasil"
         echo -e "${Red} V2ray 配置信息 ${Font}"
         echo -e "${Red} 地址（address）:${Font} $(info_extraction '\"add\"') "
         echo -e "${Red} 端口（port）：${Font} $(info_extraction '\"port\"') "
@@ -812,12 +812,12 @@ EOF
 
 tls_type() {
     if [[ -f "/etc/nginx/sbin/nginx" ]] && [[ -f "$nginx_conf" ]] && [[ "$shell_mode" == "ws" ]]; then
-        echo "请选择支持的 TLS 版本（default:3）:"
-        echo "请注意,如果你使用 Quantaumlt X / 路由器 / 旧版 Shadowrocket / 低于 4.18.1 版本的 V2ray core 请选择 兼容模式"
-        echo "1: TLS1.1 TLS1.2 and TLS1.3（兼容模式）"
-        echo "2: TLS1.2 and TLS1.3 (兼容模式)"
+        echo "Silakan pilih versi TLS yang didukung（default:3）:"
+        echo "Harap diingat bahwa jika Anda menggunakan Quantaumlt X / route / versi lama Shadowrocket / lebih rendah dari 4.18.1 versi V2ray core Pilih Mode Kompatibilitas"
+        echo "1: TLS1.1 TLS1.2 and TLS1.3（mode kompatibilitas）"
+        echo "2: TLS1.2 and TLS1.3 (mode kompatibilitas)"
         echo "3: TLS1.3 only"
-        read -rp "请输入：" tls_version
+        read -rp "Silakan masukkan：" tls_version
         [[ -z ${tls_version} ]] && tls_version=3
         if [[ $tls_version == 3 ]]; then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.3;/' $nginx_conf
@@ -880,7 +880,7 @@ uninstall_all() {
     fi
     [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
     [[ -d $web_dir ]] && rm -rf $web_dir
-    echo -e "${OK} ${Green} 是否卸载acme.sh及证书 [Y/N]? ${Font}"
+    echo -e "${OK} ${Green} Apakah akan menghapus acme.sh dan sertifikat atau tidak [Y/N]? ${Font}"
     read -r uninstall_acme
     case $uninstall_acme in
     [yY][eE][sS] | [yY])
@@ -961,7 +961,7 @@ update_sh() {
     echo "$ol_version" >$version_cmp
     echo "$shell_version" >>$version_cmp
     if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]; then
-        echo -e "${OK} ${GreenBG} 存在新版本，是否更新 [Y/N]? ${Font}"
+        echo -e "${OK} ${GreenBG} Ada versi baru, apakah sudah diperbarui [Y/N]? ${Font}"
         read -r update_confirm
         case $update_confirm in
         [yY][eE][sS] | [yY])
@@ -1015,28 +1015,28 @@ menu() {
     echo -e "\thttps://github.com/wulabing\n"
     echo -e "当前已安装版本:${shell_mode}\n"
 
-    echo -e "—————————————— 安装向导 ——————————————"""
-    echo -e "${Green}0.${Font}  升级 脚本"
-    echo -e "${Green}1.${Font}  安装 V2Ray (Nginx+ws+tls)"
-    echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
-    echo -e "${Green}3.${Font}  升级 V2Ray core"
-    echo -e "—————————————— 配置变更 ——————————————"
-    echo -e "${Green}4.${Font}  变更 UUID"
-    echo -e "${Green}6.${Font}  变更 port"
-    echo -e "${Green}7.${Font}  变更 TLS 版本(仅ws+tls有效)"
-    echo -e "${Green}18.${Font}  变更伪装路径"
-    echo -e "—————————————— 查看信息 ——————————————"
-    echo -e "${Green}8.${Font}  查看 实时访问日志"
-    echo -e "${Green}9.${Font}  查看 实时错误日志"
-    echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
-    echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
-    echo -e "${Green}12.${Font} 安装 MTproxy(支持TLS混淆)"
-    echo -e "${Green}13.${Font} 证书 有效期更新"
-    echo -e "${Green}14.${Font} 卸载 V2Ray"
-    echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
-    echo -e "${Green}16.${Font} 清空 证书遗留文件"
-    echo -e "${Green}17.${Font} 退出 \n"
+    echo -e "—————————————— Panduan instalasi ——————————————"""
+    echo -e "${Green}0.${Font}  Upgrade Script"
+    echo -e "${Green}1.${Font}  Install V2Ray (Nginx+ws+tls)"
+    echo -e "${Green}2.${Font}  Install V2Ray (http/2)"
+    echo -e "${Green}3.${Font}  Upgrade V2Ray core"
+    echo -e "—————————————— Perubahan konfigurasi ——————————————"
+    echo -e "${Green}4.${Font}  Edit UUID"
+    echo -e "${Green}6.${Font}  Edit port"
+    echo -e "${Green}7.${Font}  Mengubah versi TLS (hanya ws+tls yang berfungsi)"
+    echo -e "${Green}18.${Font}  Ubah jalur kamuflase"
+    echo -e "—————————————— Lihat Informasi ——————————————"
+    echo -e "${Green}8.${Font}  Lihat Log Akses real-time"
+    echo -e "${Green}9.${Font}  Melihat log kesalahan secara real-time"
+    echo -e "${Green}10.${Font} Melihat Informasi Konfigurasi V2Ray"
+    echo -e "—————————————— Opsi lainnya ——————————————"
+    echo -e "${Green}11.${Font} Instalasi 4 in 1 bbr Skrip Instalasi Razor"
+    echo -e "${Green}12.${Font} Pemasangan MTproxy(Dukungan TLS)"
+    echo -e "${Green}13.${Font} Perpanjangan masa berlaku sertifikat"
+    echo -e "${Green}14.${Font} pencopotan pemasangan V2Ray"
+    echo -e "${Green}15.${Font} Perbarui tugas terjadwal crontab Sertifikat"
+    echo -e "${Green}16.${Font} Mengosongkan berkas warisan sertifikat"
+    echo -e "${Green}17.${Font} Batalkan \n"
 
     read -rp "请输入数字：" menu_num
     case $menu_num in
@@ -1111,7 +1111,7 @@ menu() {
         exit 0
         ;;
     18)
-        read -rp "请输入伪装路径(注意！不需要加斜杠 eg:ray):" camouflage_path
+        read -rp "Masuk ke jalur kamuflase(Perhatian! Tidak perlu garis miring eg:ray):" camouflage_path
         modify_camouflage_path
         start_process_systemd
         ;;
