@@ -311,7 +311,7 @@ web_camouflage() {
     mkdir -p /home/wwwroot
     cd /home/wwwroot || exit
     git clone https://github.com/wulabing/3DCEList.git
-    judge "web 站点伪装"
+    judge "web Kamuflase situs"
 }
 
 v2ray_install() {
@@ -1055,12 +1055,12 @@ menu() {
         bash <(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/${github_branch}/v2ray.sh)
         ;;
     4)
-        read -rp "请输入UUID:" UUID
+        read -rp "Silakan masukkan UUID:" UUID
         modify_UUID
         start_process_systemd
         ;;
     6)
-        read -rp "请输入连接端口:" port
+        read -rp "Harap masukkan port koneksi:" port
         if grep -q "ws" $v2ray_qr_config_file; then
             modify_nginx_port
         elif grep -q "h2" $v2ray_qr_config_file; then
@@ -1116,7 +1116,7 @@ menu() {
         start_process_systemd
         ;;
     *)
-        echo -e "${RedBG}请输入正确的数字${Font}"
+        echo -e "${RedBG}Silakan masukkan nomor yang benar${Font}"
         ;;
     esac
 }
