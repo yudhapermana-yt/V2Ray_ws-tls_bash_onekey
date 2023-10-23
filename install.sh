@@ -92,7 +92,7 @@ check_system() {
         rm /var/cache/apt/archives/lock
         $INS update
     else
-        echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
+        echo -e "${Error} ${RedBG} Sistem saat ini adalah ${ID} ${VERSION_ID} Tidak ada dalam daftar sistem yang didukung, gangguan instalasi ${Font}"
         exit 1
     fi
 
@@ -109,7 +109,7 @@ check_system() {
 
 is_root() {
     if [ 0 == $UID ]; then
-        echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font}"
+        echo -e "${OK} ${GreenBG} Pengguna saat ini adalah root, masuk ke proses instalasi ${Font}"
         sleep 3
     else
         echo -e "${Error} ${RedBG} 当前用户不是root用户，请切换到root用户后重新执行脚本 ${Font}"
@@ -153,11 +153,11 @@ chrony_install() {
     [[ -z ${chrony_install} ]] && chrony_install="Y"
     case $chrony_install in
     [yY][eE][sS] | [yY])
-        echo -e "${GreenBG} 继续安装 ${Font}"
+        echo -e "${GreenBG} Lanjutkan instalasi ${Font}"
         sleep 2
         ;;
     *)
-        echo -e "${RedBG} 安装终止 ${Font}"
+        echo -e "${RedBG} Hentikan instalasi ${Font}"
         exit 2
         ;;
     esac
@@ -184,23 +184,23 @@ dependency_install() {
     judge "crontab 自启动配置 "
 
     ${INS} -y install bc
-    judge "安装 bc"
+    judge "pemasangan bc"
 
     ${INS} -y install unzip
-    judge "安装 unzip"
+    judge "pemasangan unzip"
 
     ${INS} -y install qrencode
-    judge "安装 qrencode"
+    judge "pemasangan qrencode"
 
     ${INS} -y install curl
-    judge "安装 curl"
+    judge "pemasangan curl"
 
     if [[ "${ID}" == "centos" ]]; then
         ${INS} -y groupinstall "Development tools"
     else
         ${INS} -y install build-essential
     fi
-    judge "编译工具包 安装"
+    judge "Instalasi Toolkit Kompilasi"
 
     if [[ "${ID}" == "centos" ]]; then
         ${INS} -y install pcre pcre-devel zlib-devel epel-release
@@ -248,7 +248,7 @@ basic_optimization() {
 
 port_alterid_set() {
     if [[ "on" != "$old_config_status" ]]; then
-        read -rp "请输入连接端口（default:443）:" port
+        read -rp "Silakan masukkan port koneksi（default:443）:" port
         [[ -z ${port} ]] && port="443"
         alterID="0"
     fi
@@ -259,7 +259,7 @@ modify_path() {
         camouflage="$(grep '\"path\"' $v2ray_qr_config_file | awk -F '"' '{print $4}')"
     fi
     sed -i "/\"path\"/c \\\t  \"path\":\"${camouflage}\"" ${v2ray_conf}
-    judge "V2ray 伪装路径 修改"
+    judge "V2ray Modifikasi Jalur Salah"
 }
 
 modify_inbound_port() {
@@ -281,7 +281,7 @@ modify_UUID() {
         UUID="$(info_extraction '\"id\"')"
     fi
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
-    judge "V2ray UUID 修改"
+    judge "V2ray UUID modifikasi"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"id\"/c \\  \"id\": \"${UUID}\"," ${v2ray_qr_config_file}
     echo -e "${OK} ${GreenBG} UUID:${UUID} ${Font}"
 }
@@ -292,9 +292,9 @@ modify_nginx_port() {
     fi
     sed -i "/ssl http2;$/c \\\tlisten ${port} ssl http2;" ${nginx_conf}
     sed -i "3c \\\tlisten [::]:${port} http2;" ${nginx_conf}
-    judge "V2ray port 修改"
+    judge "V2ray port modifikasi"
     [ -f ${v2ray_qr_config_file} ] && sed -i "/\"port\"/c \\  \"port\": \"${port}\"," ${v2ray_qr_config_file}
-    echo -e "${OK} ${GreenBG} 端口号:${port} ${Font}"
+    echo -e "${OK} ${GreenBG} nomor port:${port} ${Font}"
 }
 
 modify_nginx_other() {
@@ -331,7 +331,7 @@ v2ray_install() {
         bash v2ray.sh --force
         judge "安装 V2ray"
     else
-        echo -e "${Error} ${RedBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
+        echo -e "${Error} ${RedBG} V2ray Pengunduhan file instalasi gagal, periksa apakah alamat pengunduhan tersedia ${Font}"
         exit 4
     fi
     # 清除临时文件
@@ -340,10 +340,10 @@ v2ray_install() {
 
 nginx_exist_check() {
     if [[ -f "/etc/nginx/sbin/nginx" ]]; then
-        echo -e "${OK} ${GreenBG} Nginx已存在，跳过编译安装过程 ${Font}"
+        echo -e "${OK} ${GreenBG} Nginx Sudah ada, lewati proses kompilasi dan instalasi ${Font}"
         sleep 2
     elif [[ -d "/usr/local/nginx/" ]]; then
-        echo -e "${OK} ${GreenBG} 检测到其他套件安装的Nginx，继续安装会造成冲突，请处理后安装${Font}"
+        echo -e "${OK} ${GreenBG} Terdeteksi Nginx terinstal oleh paket lain, melanjutkan penginstalan akan menyebabkan konflik, silakan proses dan instal!${Font}"
         exit 1
     else
         nginx_install
@@ -356,11 +356,11 @@ nginx_install() {
     #    fi
 
     wget -nc --no-check-certificate http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
-    judge "Nginx 下载"
+    judge "Nginx mengunduh"
     wget -nc --no-check-certificate https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
-    judge "openssl 下载"
+    judge "openssl mengunduh"
     wget -nc --no-check-certificate https://github.com/jemalloc/jemalloc/releases/download/${jemalloc_version}/jemalloc-${jemalloc_version}.tar.bz2 -P ${nginx_openssl_src}
-    judge "jemalloc 下载"
+    judge "jemalloc mengunduh"
 
     cd ${nginx_openssl_src} || exit
 
@@ -375,18 +375,18 @@ nginx_install() {
 
     [[ -d "$nginx_dir" ]] && rm -rf ${nginx_dir}
 
-    echo -e "${OK} ${GreenBG} 即将开始编译安装 jemalloc ${Font}"
+    echo -e "${OK} ${GreenBG} Akan mulai mengkompilasi dan menginstal jemalloc ${Font}"
     sleep 2
 
     cd jemalloc-${jemalloc_version} || exit
     ./configure
-    judge "编译检查"
+    judge "Pemeriksaan kompilasi"
     make -j "${THREAD}" && make install
     judge "jemalloc 编译安装"
     echo '/usr/local/lib' >/etc/ld.so.conf.d/local.conf
     ldconfig
 
-    echo -e "${OK} ${GreenBG} 即将开始编译安装 Nginx, 过程稍久，请耐心等待 ${Font}"
+    echo -e "${OK} ${GreenBG} Kami akan mulai mengkompilasi dan menginstal Nginx, prosesnya akan memakan waktu cukup lama, harap bersabar! ${Font}"
     sleep 4
 
     cd ../nginx-${nginx_version} || exit
@@ -407,7 +407,7 @@ nginx_install() {
         --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make -j "${THREAD}" && make install
-    judge "Nginx 编译安装"
+    judge "Nginx mengkompilasi dan menginstal"
 
     # 修改基本配置
     sed -i 's/#user  nobody;/user  root;/' ${nginx_dir}/conf/nginx.conf
@@ -431,28 +431,28 @@ ssl_install() {
     else
         ${INS} install socat netcat -y
     fi
-    judge "安装 SSL 证书生成脚本依赖"
+    judge "Menginstal Ketergantungan Skrip Pembuatan Sertifikat SSL"
 
     curl https://get.acme.sh | sh
-    judge "安装 SSL 证书生成脚本"
+    judge "Menginstal Skrip Pembuatan Sertifikat SSL"
 }
 
 domain_check() {
     read -rp "Silakan masukkan informasi domain Anda(eg:www.wulabing.com):" domain
     domain_ip=$(curl -sm8 https://ipget.net/?ip="${domain}")
-    echo -e "${OK} ${GreenBG} 正在获取 公网ip 信息，请耐心等待 ${Font}"
+    echo -e "${OK} ${GreenBG} Untuk mendapatkan informasi IP publik, harap bersabar. ${Font}"
     wgcfv4_status=$(curl -s4m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
     wgcfv6_status=$(curl -s6m8 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
     if [[ ${wgcfv4_status} =~ "on"|"plus" ]] || [[ ${wgcfv6_status} =~ "on"|"plus" ]]; then
         # 关闭wgcf-warp，以防误判VPS IP情况
         wg-quick down wgcf >/dev/null 2>&1
-        echo -e "${OK} ${GreenBG} 已关闭 wgcf-warp ${Font}"
+        echo -e "${OK} ${GreenBG} Ditutup wgcf-warp ${Font}"
     fi
     local_ipv4=$(curl -s4m8 http://ip.sb)
     local_ipv6=$(curl -s6m8 http://ip.sb)
     if [[ -z ${local_ipv4} && -n ${local_ipv6} ]]; then
         echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
-        echo -e "${OK} ${GreenBG} 识别为 IPv6 Only 的 VPS，自动添加 DNS64 服务器 ${Font}"
+        echo -e "${OK} ${GreenBG} Mengidentifikasi VPS sebagai IPv6 Only, secara otomatis menambahkan server DNS64 ${Font}"
     fi
     echo -e "IP：${domain_ip}"
     echo -e "IPv4: ${local_ipv4}"
@@ -482,15 +482,15 @@ domain_check() {
 
 port_exist_check() {
     if [[ 0 -eq $(lsof -i:"$1" | grep -i -c "listen") ]]; then
-        echo -e "${OK} ${GreenBG} $1 端口未被占用 ${Font}"
+        echo -e "${OK} ${GreenBG} $1 Port tidak ditempati ${Font}"
         sleep 1
     else
-        echo -e "${Error} ${RedBG} 检测到 $1 端口被占用，以下为 $1 端口占用信息 ${Font}"
+        echo -e "${Error} ${RedBG} terdeteksi $1 port ditempati, berikut ini $1 Informasi Hunian Pelabuhan ${Font}"
         lsof -i:"$1"
-        echo -e "${OK} ${GreenBG} 5s 后将尝试自动 kill 占用进程 ${Font}"
+        echo -e "${OK} ${GreenBG} 5s Setelah itu, ia akan mencoba membunuh proses yang ditempati secara otomatis ${Font}"
         sleep 5
         lsof -i:"$1" | awk '{print $2}' | grep -v "PID" | xargs kill -9
-        echo -e "${OK} ${GreenBG} kill 完成 ${Font}"
+        echo -e "${OK} ${GreenBG} kill memenuhi ${Font}"
         sleep 1
     fi
 }
@@ -498,23 +498,23 @@ acme() {
     "$HOME"/.acme.sh/acme.sh --set-default-ca --server letsencrypt
 
     if "$HOME"/.acme.sh/acme.sh --issue --insecure -d "${domain}" --standalone -k ec-256 --force; then
-        echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
+        echo -e "${OK} ${GreenBG} SSL Pembuatan Sertifikat Berhasil ${Font}"
         sleep 2
         mkdir /data
         if "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc --force; then
-            echo -e "${OK} ${GreenBG} 证书配置成功 ${Font}"
+            echo -e "${OK} ${GreenBG} Konfigurasi Sertifikat Berhasil ${Font}"
             sleep 2
             if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
                 wg-quick up wgcf >/dev/null 2>&1
-                echo -e "${OK} ${GreenBG} 已启动 wgcf-warp ${Font}"
+                echo -e "${OK} ${GreenBG} diaktifkan wgcf-warp ${Font}"
             fi
         fi
     else
-        echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
+        echo -e "${Error} ${RedBG} SSL Kegagalan Pembuatan Sertifikat ${Font}"
         rm -rf "$HOME/.acme.sh/${domain}_ecc"
         if [[ -n $(type -P wgcf) && -n $(type -P wg-quick) ]]; then
             wg-quick up wgcf >/dev/null 2>&1
-            echo -e "${OK} ${GreenBG} 已启动 wgcf-warp ${Font}"
+            echo -e "${OK} ${GreenBG} diaktifkan wgcf-warp ${Font}"
         fi
         exit 1
     fi
@@ -538,17 +538,17 @@ v2ray_conf_add_h2() {
 
 old_config_exist_check() {
     if [[ -f $v2ray_qr_config_file ]]; then
-        echo -e "${OK} ${GreenBG} 检测到旧配置文件，是否读取旧文件配置 [Y/N]? ${Font}"
+        echo -e "${OK} ${GreenBG} File konfigurasi lama terdeteksi, apakah akan membaca konfigurasi file lama [Y/N]? ${Font}"
         read -r ssl_delete
         case $ssl_delete in
         [yY][eE][sS] | [yY])
-            echo -e "${OK} ${GreenBG} 已保留旧配置  ${Font}"
+            echo -e "${OK} ${GreenBG} Konfigurasi lama tetap dipertahankan  ${Font}"
             old_config_status="on"
             port=$(info_extraction '\"port\"')
             ;;
         *)
             rm -rf $v2ray_qr_config_file
-            echo -e "${OK} ${GreenBG} 已删除旧配置  ${Font}"
+            echo -e "${OK} ${GreenBG} Konfigurasi lama dihapus  ${Font}"
             ;;
         esac
     fi
@@ -610,18 +610,18 @@ start_process_systemd() {
     chown -R root.root /var/log/v2ray/
     if [[ "$shell_mode" != "h2" ]]; then
         systemctl restart nginx
-        judge "Nginx 启动"
+        judge "Nginx aktifkan"
     fi
     systemctl restart v2ray
-    judge "V2ray 启动"
+    judge "V2ray aktifkan"
 }
 
 enable_process_systemd() {
     systemctl enable v2ray
-    judge "设置 v2ray 开机自启"
+    judge "设置 v2ray memulai"
     if [[ "$shell_mode" != "h2" ]]; then
         systemctl enable nginx
-        judge "设置 Nginx 开机自启"
+        judge "Menyiapkan Nginx untuk boot"
     fi
 
 }
@@ -662,7 +662,7 @@ acme_cron_update() {
           sed -i "/acme.sh/c 0 3 * * 0 bash ${ssl_update_file}" /var/spool/cron/crontabs/root
       fi
     fi
-    judge "cron 计划任务更新"
+    judge "cron Pembaruan Tugas Terjadwal"
 }
 
 vmess_qr_config_tls_ws() {
@@ -762,13 +762,13 @@ show_information() {
 
 ssl_judge_and_install() {
     if [[ -f "/data/v2ray.key" || -f "/data/v2ray.crt" ]]; then
-        echo "/data 目录下证书文件已存在"
-        echo -e "${OK} ${GreenBG} 是否删除 [Y/N]? ${Font}"
+        echo "/data File sertifikat sudah ada di direktori"
+        echo -e "${OK} ${GreenBG} Menghapus atau tidak [Y/N]? ${Font}"
         read -r ssl_delete
         case $ssl_delete in
         [yY][eE][sS] | [yY])
             rm -rf /data/v2ray.crt /data/v2ray.key
-            echo -e "${OK} ${GreenBG} 已删除 ${Font}"
+            echo -e "${OK} ${GreenBG} dihapus ${Font}"
             ;;
         *) ;;
 
@@ -776,11 +776,11 @@ ssl_judge_and_install() {
     fi
 
     if [[ -f "/data/v2ray.key" || -f "/data/v2ray.crt" ]]; then
-        echo "证书文件已存在"
+        echo "Berkas sertifikat sudah ada"
     elif [[ -f "$HOME/.acme.sh/${domain}_ecc/${domain}.key" && -f "$HOME/.acme.sh/${domain}_ecc/${domain}.cer" ]]; then
-        echo "证书文件已存在"
+        echo "Berkas sertifikat sudah ada"
         "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
-        judge "证书应用"
+        judge "Pendaftaran Sertifikat"
     else
         ssl_install
         acme
@@ -806,7 +806,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
-    judge "Nginx systemd ServerFile 添加"
+    judge "Nginx systemd ServerFile meningkatkan"
     systemctl daemon-reload
 }
 
@@ -821,31 +821,31 @@ tls_type() {
         [[ -z ${tls_version} ]] && tls_version=3
         if [[ $tls_version == 3 ]]; then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.3;/' $nginx_conf
-            echo -e "${OK} ${GreenBG} 已切换至 TLS1.3 only ${Font}"
+            echo -e "${OK} ${GreenBG} Beralih ke TLS1.3 only ${Font}"
         elif [[ $tls_version == 1 ]]; then
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.1 TLSv1.2 TLSv1.3;/' $nginx_conf
-            echo -e "${OK} ${GreenBG} 已切换至 TLS1.1 TLS1.2 and TLS1.3 ${Font}"
+            echo -e "${OK} ${GreenBG} Beralih ke TLS1.1 TLS1.2 and TLS1.3 ${Font}"
         else
             sed -i 's/ssl_protocols.*/ssl_protocols         TLSv1.2 TLSv1.3;/' $nginx_conf
-            echo -e "${OK} ${GreenBG} 已切换至 TLS1.2 and TLS1.3 ${Font}"
+            echo -e "${OK} ${GreenBG} Beralih ke TLS1.2 and TLS1.3 ${Font}"
         fi
         systemctl restart nginx
-        judge "Nginx 重启"
+        judge "Nginx buka kembali"
     else
-        echo -e "${Error} ${RedBG} Nginx 或 配置文件不存在 或当前安装版本为 h2 ，请正确安装脚本后执行${Font}"
+        echo -e "${Error} ${RedBG} Nginx atau file konfigurasi tidak ada atau versi instalasi saat ini adalah h2, jalankan skrip setelah menginstalnya dengan benar.${Font}"
     fi
 }
 
 show_access_log() {
-    [ -f ${v2ray_access_log} ] && tail -f ${v2ray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+    [ -f ${v2ray_access_log} ] && tail -f ${v2ray_access_log} || echo -e "${RedBG}log Berkas tidak ada${Font}"
 }
 
 show_error_log() {
-    [ -f ${v2ray_error_log} ] && tail -f ${v2ray_error_log} || echo -e "${RedBG}log文件不存在${Font}"
+    [ -f ${v2ray_error_log} ] && tail -f ${v2ray_error_log} || echo -e "${RedBG}log Berkas tidak ada${Font}"
 }
 
 ssl_update_manuel() {
-    [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e "${RedBG}证书签发工具不存在，请确认你是否使用了自己的证书${Font}"
+    [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e "${RedBG}Alat penerbitan sertifikat tidak ada, pastikan Anda menggunakan sertifikat Anda sendiri${Font}"
     domain="$(info_extraction '\"add\"')"
     "$HOME"/.acme.sh/acme.sh --installcert -d "${domain}" --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
 }
@@ -856,7 +856,7 @@ bbr_boost_sh() {
 }
 
 mtproxy_sh() {
-    echo -e "${Error} ${RedBG} 功能维护，暂不可用 ${Font}"
+    echo -e "${Error} ${RedBG} Pemeliharaan fungsi, tidak tersedia saat ini ${Font}"
 }
 
 uninstall_all() {
@@ -866,13 +866,13 @@ uninstall_all() {
     [[ -f $v2ctl_bin_dir ]] && rm -f $v2ctl_bin_dir
     [[ -d $v2ray_bin_dir_old ]] && rm -rf $v2ray_bin_dir_old
     if [[ -d $nginx_dir ]]; then
-        echo -e "${OK} ${Green} 是否卸载 Nginx [Y/N]? ${Font}"
+        echo -e "${OK} ${Green} Apakah akan menghapus instalasi Nginx [Y/N]? ${Font}"
         read -r uninstall_nginx
         case $uninstall_nginx in
         [yY][eE][sS] | [yY])
             rm -rf $nginx_dir
             rm -rf $nginx_systemd_file
-            echo -e "${OK} ${Green} 已卸载 Nginx ${Font}"
+            echo -e "${OK} ${Green} dicopot pemasangannya Nginx ${Font}"
             ;;
         *) ;;
 
@@ -896,7 +896,7 @@ uninstall_all() {
 delete_tls_key_and_crt() {
     [[ -f $HOME/.acme.sh/acme.sh ]] && /root/.acme.sh/acme.sh uninstall >/dev/null 2>&1
     [[ -d $HOME/.acme.sh ]] && rm -rf "$HOME/.acme.sh"
-    echo -e "${OK} ${GreenBG} 已清空证书遗留文件 ${Font}"
+    echo -e "${OK} ${GreenBG} File warisan sertifikat dihapus ${Font}"
 }
 judge_mode() {
     if [ -f $v2ray_bin_dir ] || [ -f $v2ray_bin_dir_old/v2ray ]; then
@@ -1010,10 +1010,10 @@ modify_camouflage_path() {
 
 menu() {
     update_sh
-    echo -e "\t V2ray 安装管理脚本 ${Red}[${shell_version}]${Font}"
+    echo -e "\t V2ray Skrip Manajemen Instalasi ${Red}[${shell_version}]${Font}"
     echo -e "\t---authored by wulabing---"
     echo -e "\thttps://github.com/wulabing\n"
-    echo -e "当前已安装版本:${shell_mode}\n"
+    echo -e "Versi yang saat ini diinstal:${shell_mode}\n"
 
     echo -e "—————————————— Panduan instalasi ——————————————"""
     echo -e "${Green}0.${Font}  Upgrade Script"
@@ -1038,7 +1038,7 @@ menu() {
     echo -e "${Green}16.${Font} Mengosongkan berkas warisan sertifikat"
     echo -e "${Green}17.${Font} Batalkan \n"
 
-    read -rp "请输入数字：" menu_num
+    read -rp "Silakan masukkan nomor：" menu_num
     case $menu_num in
     0)
         update_sh
