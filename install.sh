@@ -669,7 +669,7 @@ vmess_qr_config_tls_ws() {
     cat >$v2ray_qr_config_file <<-EOF
 {
   "v": "2",
-  "ps": "wulabing_${domain}",
+  "ps": "${domain}",
   "add": "${domain}",
   "port": "${port}",
   "id": "${UUID}",
@@ -816,7 +816,7 @@ tls_type() {
         echo "Harap diingat bahwa jika Anda menggunakan Quantaumlt X / route / versi lama Shadowrocket / lebih rendah dari 4.18.1 versi V2ray core Pilih Mode Kompatibilitas"
         echo "1: TLS1.1 TLS1.2 and TLS1.3（mode kompatibilitas）"
         echo "2: TLS1.2 and TLS1.3 (mode kompatibilitas)"
-        echo "3: TLS1.3 only"
+        echo "3: TLS1.3 only (edu coid)"
         read -rp "Silakan masukkan：" tls_version
         [[ -z ${tls_version} ]] && tls_version=3
         if [[ $tls_version == 3 ]]; then
